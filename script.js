@@ -118,6 +118,7 @@ function update() {
     snake.pop();
   }
 
+  directionLocked = false;
   draw();
 }
 
