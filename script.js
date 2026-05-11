@@ -186,11 +186,13 @@ function changeDirection(direction) {
 }
 
 document.addEventListener("keydown", (event) => {
-  if (event.key === "ArrowUp") changeDirection("up");
-  if (event.key === "ArrowDown") changeDirection("down");
-  if (event.key === "ArrowLeft") changeDirection("left");
-  if (event.key === "ArrowRight") changeDirection("right");
-  if (event.key === " ") startGame();
+  const key = event.key.toLowerCase();
+
+  if (key === "arrowup" || key === "w") changeDirection("up");
+  if (key === "arrowdown" || key === "s") changeDirection("down");
+  if (key === "arrowleft" || key === "a") changeDirection("left");
+  if (key === "arrowright" || key === "d") changeDirection("right");
+  if (key === " ") startGame();
 });
 
 document.querySelectorAll(".mobile-controls button").forEach((button) => {
