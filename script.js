@@ -23,7 +23,7 @@ let score;
 let gameLoop;
 let gameRunning;
 let gameOver;
-let directionLocked;
+let directionQueue;
 
 function getBestScore() {
   return Number(localStorage.getItem(bestScoreKey)) || 0;
@@ -48,13 +48,13 @@ function resetGame() {
   score = 0;
   gameRunning = false;
   gameOver = false;
-  directionLocked = false;
+  directionQueue = [];
 
   scoreEl.textContent = score;
   bestScoreEl.textContent = getBestScore();
   messageEl.textContent = "按「開始遊戲」開始";
 
-  directionLocked = false;
+  directionQueue = [];
   draw();
 }
 
@@ -88,6 +88,8 @@ function endGame() {
 }
 
 function update() {
+  applyQueuedDirection();
+
   dx = nextDx;
   dy = nextDy;
 
@@ -118,7 +120,6 @@ function update() {
     snake.pop();
   }
 
-  directionLocked = false;
   draw();
 }
 
@@ -195,17 +196,30 @@ function changeDirection(direction) {
 
   if (!requested) return;
 
-  const isSameDirection = requested.x === nextDx && requested.y === nextDy;
+  const lastDirection = directionQueue.length
+    ? directionQueue[directionQueue.length - 1]
+    : { x: nextDx, y: nextDy };
+
+  const isSameDirection = requested.x === lastDirection.x && requested.y === lastDirection.y;
   if (isSameDirection) return;
 
-  if (directionLocked) return;
-
-  const isReverseDirection = requested.x === -dx && requested.y === -dy;
+  const isReverseDirection = requested.x === -lastDirection.x && requested.y === -lastDirection.y;
   if (isReverseDirection) return;
 
-  nextDx = requested.x;
-  nextDy = requested.y;
-  directionLocked = true;
+  directionQueue.push(requested);
+
+  if (directionQueue.length > 2) {
+    directionQueue.shift();
+  }
+}
+
+function applyQueuedDirection() {
+  if (!directionQueue.length) return;
+
+  const nextDirection = directionQueue.shift();
+
+  nextDx = nextDirection.x;
+  nextDy = nextDirection.y;
 }
 
 document.addEventListener("keydown", (event) => {
