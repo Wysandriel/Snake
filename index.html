@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Classic Snake</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main class="game-wrap">
+    <h1>Classic Snake</h1>
+    <p class="hint">方向鍵控制移動，吃到食物會變長，撞牆或撞到自己就結束。</p>
+
+    <div class="info">
+      <div>分數：<span id="score">0</span></div>
+      <div>最高分：<span id="bestScore">0</span></div>
+    </div>
+
+    <canvas id="game" width="400" height="400"></canvas>
+
+    <div class="controls">
+      <button id="startBtn">開始遊戲</button>
+      <button id="restartBtn">重新開始</button>
+    </div>
+
+    <p id="message" class="message">按「開始遊戲」開始</p>
+
+    <div class="mobile-controls">
+      <button data-dir="up">▲</button>
+      <div>
+        <button data-dir="left">◀</button>
+        <button data-dir="down">▼</button>
+        <button data-dir="right">▶</button>
+      </div>
+    </div>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
