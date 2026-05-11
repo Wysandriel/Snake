@@ -55,6 +55,8 @@ function resetGame() {
 }
 
 function startGame() {
+  canvas.focus();
+
   if (gameRunning) return;
 
   if (gameOver) {
@@ -164,35 +166,60 @@ function hitSelf(head) {
 function changeDirection(direction) {
   if (!gameRunning) return;
 
-  if (direction === "up" && dy !== 1) {
+  if (direction === "up" && nextDy !== 1) {
     nextDx = 0;
     nextDy = -1;
   }
 
-  if (direction === "down" && dy !== -1) {
+  if (direction === "down" && nextDy !== -1) {
     nextDx = 0;
     nextDy = 1;
   }
 
-  if (direction === "left" && dx !== 1) {
+  if (direction === "left" && nextDx !== 1) {
     nextDx = -1;
     nextDy = 0;
   }
 
-  if (direction === "right" && dx !== -1) {
+  if (direction === "right" && nextDx !== -1) {
     nextDx = 1;
     nextDy = 0;
   }
 }
 
 document.addEventListener("keydown", (event) => {
+  const code = event.code;
   const key = event.key.toLowerCase();
 
-  if (key === "arrowup" || key === "w") changeDirection("up");
-  if (key === "arrowdown" || key === "s") changeDirection("down");
-  if (key === "arrowleft" || key === "a") changeDirection("left");
-  if (key === "arrowright" || key === "d") changeDirection("right");
-  if (key === " ") startGame();
+  const controls = {
+    ArrowUp: "up",
+    ArrowDown: "down",
+    ArrowLeft: "left",
+    ArrowRight: "right",
+    KeyW: "up",
+    KeyS: "down",
+    KeyA: "left",
+    KeyD: "right"
+  };
+
+  const fallbackControls = {
+    w: "up",
+    s: "down",
+    a: "left",
+    d: "right"
+  };
+
+  const direction = controls[code] || fallbackControls[key];
+
+  if (direction) {
+    event.preventDefault();
+    changeDirection(direction);
+  }
+
+  if (code === "Space" || key === " ") {
+    event.preventDefault();
+    startGame();
+  }
 });
 
 document.querySelectorAll(".mobile-controls button").forEach((button) => {
