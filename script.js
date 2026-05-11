@@ -23,6 +23,7 @@ let score;
 let gameLoop;
 let gameRunning;
 let gameOver;
+let directionLocked;
 
 function getBestScore() {
   return Number(localStorage.getItem(bestScoreKey)) || 0;
@@ -47,11 +48,13 @@ function resetGame() {
   score = 0;
   gameRunning = false;
   gameOver = false;
+  directionLocked = false;
 
   scoreEl.textContent = score;
   bestScoreEl.textContent = getBestScore();
   messageEl.textContent = "按「開始遊戲」開始";
 
+  directionLocked = false;
   draw();
 }
 
@@ -93,14 +96,16 @@ function update() {
     y: snake[0].y + dy
   };
 
-  if (hitWall(head) || hitSelf(head)) {
+  const willEatFood = head.x === food.x && head.y === food.y;
+
+  if (hitWall(head) || hitSelf(head, willEatFood)) {
     endGame();
     return;
   }
 
   snake.unshift(head);
 
-  if (head.x === food.x && head.y === food.y) {
+  if (willEatFood) {
     score += 10;
     scoreEl.textContent = score;
 
@@ -172,32 +177,34 @@ function hitWall(head) {
   return head.x < 0 || head.x >= tileCount || head.y < 0 || head.y >= tileCount;
 }
 
-function hitSelf(head) {
-  return snake.some((part) => part.x === head.x && part.y === head.y);
+function hitSelf(head, willEatFood) {
+  const bodyToCheck = willEatFood ? snake : snake.slice(0, -1);
+  return bodyToCheck.some((part) => part.x === head.x && part.y === head.y);
 }
 
 function changeDirection(direction) {
   if (!gameRunning) return;
 
-  if (direction === "up" && nextDy !== 1) {
-    nextDx = 0;
-    nextDy = -1;
-  }
+  const requested = {
+    up: { x: 0, y: -1 },
+    down: { x: 0, y: 1 },
+    left: { x: -1, y: 0 },
+    right: { x: 1, y: 0 }
+  }[direction];
 
-  if (direction === "down" && nextDy !== -1) {
-    nextDx = 0;
-    nextDy = 1;
-  }
+  if (!requested) return;
 
-  if (direction === "left" && nextDx !== 1) {
-    nextDx = -1;
-    nextDy = 0;
-  }
+  const isSameDirection = requested.x === nextDx && requested.y === nextDy;
+  if (isSameDirection) return;
 
-  if (direction === "right" && nextDx !== -1) {
-    nextDx = 1;
-    nextDy = 0;
-  }
+  if (directionLocked) return;
+
+  const isReverseDirection = requested.x === -dx && requested.y === -dy;
+  if (isReverseDirection) return;
+
+  nextDx = requested.x;
+  nextDy = requested.y;
+  directionLocked = true;
 }
 
 document.addEventListener("keydown", (event) => {
