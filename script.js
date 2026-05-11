@@ -9,6 +9,7 @@ const restartBtn = document.getElementById("restartBtn");
 
 const gridSize = 20;
 const tileCount = canvas.width / gridSize;
+const maxSnakeLength = tileCount * tileCount - 1;
 const speed = 120;
 const bestScoreKey = "classic-snake-best-score";
 
@@ -102,6 +103,11 @@ function update() {
   if (head.x === food.x && head.y === food.y) {
     score += 10;
     scoreEl.textContent = score;
+
+    if (snake.length >= maxSnakeLength) {
+      snake.pop();
+    }
+
     food = createFood();
   } else {
     snake.pop();
@@ -143,16 +149,23 @@ function drawGrid() {
 }
 
 function createFood() {
-  let newFood;
+  const emptyCells = [];
 
-  do {
-    newFood = {
-      x: Math.floor(Math.random() * tileCount),
-      y: Math.floor(Math.random() * tileCount)
-    };
-  } while (snake && snake.some((part) => part.x === newFood.x && part.y === newFood.y));
+  for (let y = 0; y < tileCount; y += 1) {
+    for (let x = 0; x < tileCount; x += 1) {
+      const occupied = snake && snake.some((part) => part.x === x && part.y === y);
 
-  return newFood;
+      if (!occupied) {
+        emptyCells.push({ x, y });
+      }
+    }
+  }
+
+  if (emptyCells.length === 0) {
+    return { x: 0, y: 0 };
+  }
+
+  return emptyCells[Math.floor(Math.random() * emptyCells.length)];
 }
 
 function hitWall(head) {
